@@ -4,10 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -19,7 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.studytimemanager.ui.*
 import com.example.studytimemanager.ui.theme.StudyTimeManagerTheme
+import com.example.studytimemanager.viewmodel.StudyViewModel
+import com.example.studytimemanager.viewmodel.TaskViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +38,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StudyTimeManagerApp() {
     var selectedScreen by remember { mutableStateOf("Dashboard") }
+
+    val taskViewModel = remember { TaskViewModel() }
+    val studyViewModel = remember { StudyViewModel() }
 
     Scaffold(
         topBar = {
@@ -93,10 +99,10 @@ fun StudyTimeManagerApp() {
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             when (selectedScreen) {
-                "Dashboard" -> DashboardScreen()
-                "Tasks" -> TaskManagerScreen()
-                "Study" -> StudyPlannerScreen()
-                "Progress" -> ProgressAnalyticsScreen()
+                "Dashboard" -> DashboardScreen(taskViewModel)
+                "Tasks" -> TaskScreen(taskViewModel)
+                "Study" -> StudyScreen(studyViewModel)
+                "Progress" -> ProgressScreen(studyViewModel)
             }
         }
     }
@@ -112,56 +118,6 @@ fun DashboardScreen() {
                 Text(task, modifier = Modifier.padding(8.dp))
             }
         }
-    }
-}
-
-@Composable
-fun TaskManagerScreen() {
-    var taskText by remember { mutableStateOf("") }
-    val tasks = remember { mutableStateListOf("Math Homework", "CS Project", "History Essay") }
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Task Manager", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
-
-        OutlinedTextField(
-            value = taskText,
-            onValueChange = { taskText = it },
-            label = { Text("New Task") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(
-            onClick = {
-                if (taskText.isNotBlank()) {
-                    tasks.add(taskText)
-                    taskText = ""
-                }
-            },
-            modifier = Modifier.padding(top = 8.dp)
-        ) {
-            Text("Add Task")
-        }
-
-        LazyColumn {
-            items(tasks) { task ->
-                Text(task, modifier = Modifier.padding(8.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun StudyPlannerScreen() {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Study Planner", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
-        Text("Schedule Study Sessions (Placeholder)")
-    }
-}
-
-@Composable
-fun ProgressAnalyticsScreen() {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Progress Analytics", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
-        Text("Track Study Progress (Placeholder)")
     }
 }
 
