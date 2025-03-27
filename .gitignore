@@ -1,15 +1,30 @@
+# Kotlin/Java build
+.gradle/
+.idea/
+.kotlin/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
 *.iml
-.gradle
-/local.properties
+
+# OS
+.DS_Store
+
+# Android Studio
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Logs
+*.log
+
+# Jetpack Compose Preview
+*.preview
+
+# Other
+app/build/
