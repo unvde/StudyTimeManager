@@ -5,20 +5,23 @@ import androidx.lifecycle.ViewModel
 import com.example.studytimemanager.model.Task
 
 class TaskViewModel : ViewModel() {
-    // List to hold tasks
+    // Internal mutable task list
     private val _tasks = mutableStateListOf<Task>()
+
+    // External read-only access to tasks
     val tasks: List<Task> get() = _tasks
 
+    // Counter for assigning unique task IDs
     private var taskIdCounter = 0
 
-    // Add new task
+    // Add a new task if the title is not blank
     fun addTask(title: String) {
         if (title.isNotBlank()) {
             _tasks.add(Task(id = taskIdCounter++, title = title))
         }
     }
 
-    // Mark task as completed
+    // Toggle the completion state of a task
     fun toggleTaskCompletion(taskId: Int) {
         val index = _tasks.indexOfFirst { it.id == taskId }
         if (index != -1) {
@@ -27,7 +30,7 @@ class TaskViewModel : ViewModel() {
         }
     }
 
-    // Optional: Remove a task
+    // Remove a task by ID
     fun removeTask(taskId: Int) {
         _tasks.removeAll { it.id == taskId }
     }

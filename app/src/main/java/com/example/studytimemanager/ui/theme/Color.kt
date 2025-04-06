@@ -2,12 +2,9 @@ package com.example.studytimemanager.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Blue40 = Color(0xFF448AFF)
-val BlueGrey40 = Color(0xFF90A4AE)
-val ErrorRed = Color(0xFFCF6679)
-val Background = Color(0xFF121212)
-val Surface = Color(0xFF1E1E1E)
-val OnPrimary = Color.White
-val OnSecondary = Color.Black
-val OnBackground = Color.White
-val OnSurface = Color.White
+val PrimaryColor = Color(0xFF779977)
+val PrimaryDark = Color(0xFF5C7A5C)
+val PrimaryLight = Color(0xFFA8CBA8)
+
+val SecondaryColor = Color(0xFF6D8E99)
+val TertiaryColor = Color(0xFFAACCCC)

@@ -1,18 +1,52 @@
 package com.example.studytimemanager.ui.theme
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+
+private val LightColorScheme = lightColorScheme(
+    primary = PrimaryColor,
+    onPrimary = Color.White,
+    primaryContainer = PrimaryLight,
+    onPrimaryContainer = Color.Black,
+    secondary = SecondaryColor,
+    tertiary = TertiaryColor,
+)
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue40,
-    secondary = BlueGrey40
+    primary = PrimaryDark,
+    onPrimary = Color.White,
+    primaryContainer = PrimaryColor,
+    onPrimaryContainer = Color.White,
+    secondary = SecondaryColor,
+    tertiary = TertiaryColor,
 )
 
 @Composable
-fun StudyTimeManagerTheme(content: @Composable () -> Unit) {
+fun StudyTimeManagerTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
+    }
+
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
