@@ -1,45 +1,27 @@
 package com.example.studytimemanager.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-class StudySessionViewModel : ViewModel() {
-
-    var totalStudyTime by mutableStateOf(0)
-        private set
-
-    var currentSessionTime by mutableStateOf(0)
-        private set
+class StudySessionViewModel(application: Application) : AndroidViewModel(application) {
 
     var isStudying by mutableStateOf(false)
-        private set
-
-    private var tickJob: Job? = null
+    var currentSessionTime by mutableStateOf(0)
 
     fun startSession() {
-        if (!isStudying) {
-            isStudying = true
-            currentSessionTime = 0
-            tickJob = viewModelScope.launch {
-                while (isStudying) {
-                    delay(1000L)
-                    currentSessionTime++
-                }
-            }
+        isStudying = true
+        viewModelScope.launch {
+            // Add logic for tracking session time
         }
     }
 
     fun stopSession() {
-        if (isStudying) {
-            isStudying = false
-            totalStudyTime += currentSessionTime
-            tickJob?.cancel()
-        }
+        isStudying = false
+        // Optionally save the session to the database
     }
 }
