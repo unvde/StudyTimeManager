@@ -5,8 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.runtime.*
@@ -15,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.studytimemanager.ui.*
-import com.example.studytimemanager.ui.ProgressScreen
 import com.example.studytimemanager.ui.theme.StudyTimeManagerTheme
 import com.example.studytimemanager.viewmodel.*
 
@@ -34,15 +35,20 @@ class MainActivity : ComponentActivity() {
 fun StudyTimeManagerApp() {
     var selectedScreen by remember { mutableStateOf("Study") }
 
-    // Pass application context directly
-    val context = LocalContext.current.applicationContext as Application
-    val studyViewModel = remember { ProgressViewModel(context) }
-    val sessionViewModel = remember { StudySessionViewModel(context) }
-    val taskViewModel: TaskViewModel = viewModel()  // Add this line to initialize taskViewModel
+    val context = LocalContext.current
+    val taskViewModel = remember { TaskViewModel() }
+
+    val studyViewModel: ProgressViewModel = viewModel(
+        factory = ProgressViewModelFactory(context.applicationContext as Application)
+    )
+
+    val sessionViewModel: StudySessionViewModel = viewModel(
+        factory = StudySessionViewModelFactory(context.applicationContext as Application)
+    )
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Study Time Manager") })
+            TopAppBar(title = { Text("Study Time Manager") })
         },
         bottomBar = {
             BottomNavigation(modifier = Modifier.fillMaxWidth().navigationBarsPadding()) {
@@ -51,6 +57,12 @@ fun StudyTimeManagerApp() {
                     onClick = { selectedScreen = "Study" },
                     icon = { Icon(Icons.Filled.Timer, contentDescription = "Study") },
                     label = { Text("Study") }
+                )
+                BottomNavigationItem(
+                    selected = (selectedScreen == "Dashboard"),
+                    onClick = { selectedScreen = "Dashboard" },
+                    icon = { Icon(Icons.Filled.List, contentDescription = "Dashboard") },
+                    label = { Text("Dashboard") }
                 )
                 BottomNavigationItem(
                     selected = (selectedScreen == "Progress"),
@@ -64,8 +76,8 @@ fun StudyTimeManagerApp() {
         Column(modifier = Modifier.padding(paddingValues)) {
             when (selectedScreen) {
                 "Study" -> StudyTimerScreen(sessionViewModel = sessionViewModel)
-                "Dashboard" -> DashboardScreen(taskViewModel = taskViewModel)  // Pass the taskViewModel here
-                "Progress" -> ProgressScreen(studyViewModel = studyViewModel, sessionViewModel = sessionViewModel)
+                "Dashboard" -> DashboardScreen(taskViewModel)
+                "Progress" -> ProgressScreen(studyViewModel, sessionViewModel)
             }
         }
     }
