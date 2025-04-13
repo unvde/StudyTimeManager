@@ -1,19 +1,16 @@
 package com.example.studytimemanager.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.studytimemanager.model.StudySession
 import com.example.studytimemanager.model.StudySessionDao
-import com.example.studytimemanager.model.StudySessionDatabase
 import kotlinx.coroutines.launch
 import java.util.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.ViewModel
 
-class StudySessionViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val studySessionDao: StudySessionDao =
-        StudySessionDatabase.getDatabase(application).studySessionDao()
+class StudySessionViewModel(
+    private val studySessionDao: StudySessionDao
+) : ViewModel() {
 
     var totalStudyTime by mutableStateOf(0)
         private set
@@ -65,11 +62,15 @@ class StudySessionViewModel(application: Application) : AndroidViewModel(applica
             }
         }
     }
-    // Load study session history from the Room database
+
     private fun loadHistory() {
         viewModelScope.launch {
             history = studySessionDao.getAllSessions()
             totalStudyTime = history.sumOf { it.duration }
         }
+    }
+    // Expose loadHistory for testing purposes
+    fun loadHistoryForTest() {
+        loadHistory()
     }
 }

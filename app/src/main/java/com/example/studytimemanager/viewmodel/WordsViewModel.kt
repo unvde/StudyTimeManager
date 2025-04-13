@@ -1,13 +1,12 @@
 package com.example.studytimemanager.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -15,57 +14,53 @@ import org.json.JSONObject
 class WordsViewModel : ViewModel() {
 
     private val _word = MutableStateFlow("Loading...")
-    val word: StateFlow<String> get() = _word
-
-    private val _description = MutableStateFlow("Loading description...")
-    val description: StateFlow<String> get() = _description
-
+    private val _description = MutableStateFlow("Please wait...")
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    val word = _word.asStateFlow()
+    val description = _description.asStateFlow()
+    val isLoading = _isLoading.asStateFlow()
 
     private val client = OkHttpClient()
 
+    private val apiKey = "fd731874cemsh8cab46b7d6ddcf4p1535a4jsn9a3dfa1df8fe"
+
     fun fetchWordData() {
-        viewModelScope.launch {
-            _isLoading.value = true
+        CoroutineScope(Dispatchers.IO).launch {
             try {
-                val word: String
-                val description: String
+                _isLoading.update { true }
 
-                withContext(Dispatchers.IO) {
-                    val request = Request.Builder()
-                        .url("https://wordsapiv1.p.rapidapi.com/words/?random=true")
-                        .get()
-                        .addHeader("x-rapidapi-key", "fd731874cemsh8cab46b7d6ddcf4p1535a4jsn9a3dfa1df8fe")
-                        .addHeader("x-rapidapi-host", "wordsapiv1.p.rapidapi.com")
-                        .build()
+                val request = Request.Builder()
+                    .url("https://wordsapiv1.p.rapidapi.com/words/?random=true")
+                    .get()
+                    .addHeader("x-rapidapi-key", apiKey)
+                    .addHeader("x-rapidapi-host", "wordsapiv1.p.rapidapi.com")
+                    .build()
 
-                    val response = client.newCall(request).execute()
-                    val responseBody = response.body?.string()
-
-                    if (!response.isSuccessful || responseBody == null) {
-                        throw Exception("Response error: $responseBody")
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        println("Request failed with code: ${response.code}")
+                        return@use
                     }
 
-                    val json = JSONObject(responseBody)
-                    word = json.getString("word")
+                    val json = JSONObject(response.body!!.string())
+                    val wordStr = json.getString("word")
                     val results = json.optJSONArray("results")
-                    description = if (results != null && results.length() > 0) {
+                    val definitionStr = if (results != null && results.length() > 0) {
                         results.getJSONObject(0).optString("definition", "No definition")
                     } else {
                         "No definition available"
                     }
+
+                    _word.update { wordStr }
+                    _description.update { definitionStr }
                 }
-
-                _word.value = word
-                _description.value = description
-
             } catch (e: Exception) {
-                Log.e("WordsViewModel", "Exception: ${e.message}", e)
-                _word.value = "Exception"
-                _description.value = e.localizedMessage ?: "Unknown exception"
+                println("Exception in fetchWordData: ${e.message}")
+                _word.update { "Error" }
+                _description.update { "Network error occurred" }
             } finally {
-                _isLoading.value = false
+                _isLoading.update { false }
             }
         }
     }

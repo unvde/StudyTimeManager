@@ -1,31 +1,31 @@
 package com.example.studytimemanager.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.studytimemanager.viewmodel.WordsViewModel
 import com.example.studytimemanager.viewmodel.StudySessionViewModel
 
 @Composable
 fun StudyTimerScreen(
-    sessionViewModel: StudySessionViewModel
+    sessionViewModel: StudySessionViewModel,
+    wordsViewModel: WordsViewModel
 ) {
     val isStudying = sessionViewModel.isStudying
     val currentTime = sessionViewModel.currentSessionTime
 
-    val wordsViewModel: WordsViewModel = viewModel()
     val word by wordsViewModel.word.collectAsState()
     val description by wordsViewModel.description.collectAsState()
     val isLoading by wordsViewModel.isLoading.collectAsState()
 
-    val initialized = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        if (!initialized.value) {
-            initialized.value = true
+        if (word == "Loading...") {
             wordsViewModel.fetchWordData()
         }
     }
@@ -69,7 +69,11 @@ fun StudyTimerScreen(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFE8F5E9)
+            ),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(
                 modifier = Modifier

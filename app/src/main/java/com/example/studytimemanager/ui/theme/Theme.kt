@@ -5,9 +5,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
@@ -17,6 +17,8 @@ private val LightColorScheme = lightColorScheme(
     onPrimaryContainer = Color.Black,
     secondary = SecondaryColor,
     tertiary = TertiaryColor,
+    background = PrimaryLight,
+    surface = Color.White
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -26,6 +28,8 @@ private val DarkColorScheme = darkColorScheme(
     onPrimaryContainer = Color.White,
     secondary = SecondaryColor,
     tertiary = TertiaryColor,
+    background = Color.Black,
+    surface = PrimaryDark // 同样加上
 )
 
 @Composable
@@ -40,8 +44,10 @@ fun StudyTimeManagerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = PrimaryDark.toArgb()
+            window.navigationBarColor = PrimaryDark.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
         }
     }
 
